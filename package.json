@@ -1,0 +1,40 @@
+{
+  "name": "my-minifigs",
+  "version": "1.0.0",
+  "description": "A webapp for tracking a LEGO Minifigure Collection",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n8blake/my-minifigs.git"
+  },
+  "keywords": [
+    "LEGO",
+    "minifig"
+  ],
+  "author": "n8blake",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/n8blake/my-minifigs/issues"
+  },
+  "homepage": "https://github.com/n8blake/my-minifigs#readme",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
+    "compression": "^1.7.4",
+    "connect-mongodb-session": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.4",
+    "passport": "^0.7.0",
+    "passport-custom": "^1.1.1",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "uuid": "^10.0.0"
+  }
+}
