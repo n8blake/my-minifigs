@@ -1,16 +1,19 @@
-const User = require('../models/user');
+const User = require('../models/User');
+require("dotenv").config();
 const LocalStrategy = require('passport-local').Strategy;
 const CustomStrategy = require('passport-custom').Strategy;
 const jwt = require('jsonwebtoken');
+const axios = require("axios");
 
 
 const configure = function(passport){
-    //console.log('configuring');
+    console.log('configuring');
     passport.serializeUser(function(user, done){
+        console.log(`Serialize User called ${user}`);
         done(null, user);
     });
     passport.deserializeUser(function(user, done){
-        //console.log(`DeserializeUser called ${id}`);
+        console.log(`Deserialize User called ${user}`);
         done(null, user);
         // User.findById(id, function(error, user){
         //     done(error, user);
@@ -18,62 +21,76 @@ const configure = function(passport){
     });
 
     // Local Strategy
-    passport.use(new LocalStrategy({
-        usernameField: 'email'
-        },
-        function(username, password, done) {
-            console.log('authenticating...');
-          User.findOne({ email: username }, function(err, user) {
-              //console.log(user);
-              try{
-                if (err) { return done(err); }
-                if (!user) {
-                    console.log('bad email');
-                  return done(null, false, { message: 'Incorrect email.' });
-                }
-                if (!user.validPassword(password)) {
-                    console.log('bad password');
-                  return done(null, false, { message: 'Incorrect password.' });
-                }
-                console.log(`authenticated ${user}`);
-                return done(null, user);
-              } catch (error) {
-                  console.error(error);
-                  return done(null, false);
-              }
-            
-          });
-        }
-      ));
+    // passport.use(new LocalStrategy({
+    //     usernameField: 'email'
+    //     },
+    //     function(username, password, done) {
+    //         console.log('authenticating...');
+    //         const authData = {
+    //             username: username,
+    //             password: password
+    //         }
+    //         const key = process.env.REBRICKABLE_API_KEY
+    //         const config = {
+    //             headers: { Authorization : `key ${key}`}
+    //         }
+    //         return axios.post(authData, config).then(response => {
+    //             if(response.data){
+    //                 console.log(response.data);
+    //                 return done(null, response.data);
+    //             } else {
+    //                 console.log(response);
+    //                 return done(null, false, {message: "no user data returned"})
+    //             }
+    //         })
+    //         .catch(function(error){
+    //             console.log(error);
+    //             return done(null, false, {message: "error logging to Rebrickable"})
+    //         })
+    //     }
+    //   ));
 
     // Custom Strategy
-    passport.use('jwt', new CustomStrategy(
-        function(request, done){
-            if(request.headers.token){
+    passport.use('rebrickable', new CustomStrategy(
+        async function(request, done){
+            console.log("using rebrickable auth...");
+            if(request.body.username && request.body.password){
                 try {
-                    const token = request.headers.token;
-                    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-                    if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
-                        //response.status(403).send("Invalid auth credentials.")
-                        return done(null, false, { message: 'Invalid auth credentials.' });
+                    console.log(`Hello ${request.body.username}`)
+                    console.log('authenticating...');
+                    let rebrickableUserURL = "https://rebrickable.com/api/v3/users/_token/"
+                    const authData = {
+                        username: request.body.username,
+                        password: request.body.password
                     }
-                    const { expirationDate } = decoded
-                    if(process.env.NODE_ENV === 'development') console.log(expirationDate);
-                    const expirationDateObject = new Date(expirationDate);
-                    if (process.env.NODE_ENV !== 'development' && expirationDateObject < new Date()) {
-                        //res.status(403).send("Token has expired.")
-                        return done(null, false, { message: 'Token has expired.' });
+                    
+                    const key = process.env.REBRICKABLE_API_KEY
+                    const config = {
+                        headers: { 
+                            Authorization : `key ${key}`,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
                     }
-                    User.findOne({ email: decoded.email }).then(user => {
-                        if(!user) {
-                            return done(null, false)
+                    axios.post(rebrickableUserURL, authData, config).then(response => {
+                        if(response.data){
+                            console.log(response.data);
+                            if(response.data.user_token){
+                                console.log("setting user data in session.")
+                                console.log(request.session);
+                                request.session.user_token = response.data.user_token;
+                                request.session.user_name = request.body.username;
+                                console.log(request.session);
+                            }
+                            response.data.user_name = request.body.username;
+                            return done(null, response.data);
                         } else {
-                            //if(process.env.NODE_ENV === 'development') console.log(user.email);
-                            return done(null, user);
+                            console.log(response);
+                            return done(null, false, {message: "no user data returned"})
                         }
                     })
-                    .catch(error => {
-                        return done(null, false);
+                    .catch(function(error){
+                        console.log(error);
+                        return done(null, false, {message: "error logging to Rebrickable"})
                     })
                 } catch (error) {
                     console.log(error);

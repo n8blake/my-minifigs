@@ -1,0 +1,11 @@
+<div class="list-group">
+    <a class="list-group-item" *ngFor="let set of set?.sets" >
+        <div class="d-flex align-items-center">
+            <img class="list-thumbnail" [src]="set.set_img_url" />
+            <div class="mx-2">
+                <h4>{{set.name || set.set_name}}</h4>
+                <p>{{set.set_num}}</p>
+            </div>
+        </div>
+    </a>
+</div>

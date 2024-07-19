@@ -1,0 +1,8 @@
+<div class="list-group">
+    <a class="list-group-item" *ngFor="let set of collection?.sets" [routerLink]="['/sets/', set.set_num]">
+        <div class="d-flex align-items-center">
+            <img class="list-thumbnail" [src]="set.set_img_url" />
+            <h4 class="mx-4">{{set.name}}</h4>
+        </div>
+    </a>
+</div>
