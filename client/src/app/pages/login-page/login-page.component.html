@@ -1,0 +1,37 @@
+<div class="container">
+    <h1>Login</h1>
+    <hr>
+    <div class="d-flex justify-content-center">
+      <div class="col-md-4">
+        <form (ngSubmit)="login()" autocomplete="off">
+          <div class="form-group my-2" >
+            <label for="userName" class="mb-1">Username: </label>
+            <em class="text-burgundy mx-2 mb-1 fw-bolder" *ngIf="username.touched && (username.touched || mouseoverLogin)" >Required</em>
+            <input name="email" id="email" type="text" [formControl]="username" class="form-control " placeholder="Email Address" required="true" [ngClass]="{
+            'is-invalid': (username && username.invalid) && (username.touched || mouseoverLogin)
+          }"/>
+            <!-- <div class="m-2">
+                <em class="text-danger fw-bolder" *ngIf="loginForm.controls['email']?.invalid && (loginForm.controls['email']?.touched || mouseoverLogin)" >Invalid Entry</em>
+                <br *ngIf="!(loginForm.controls['email'].invalid && (loginForm.controls['email'].touched || mouseoverLogin))">
+            </div> -->
+          </div>
+          <div class="form-group my-2" >
+            <label for="password" class="mb-1">Password:</label>
+            <em class="text-burgundy mx-2 mb-1 fw-bolder" *ngIf="password.invalid && (password.touched || mouseoverLogin)" >Required</em>
+            <input name="password" id="password" type="password" class="form-control "placeholder="Password" required="true" [formControl]="password" [ngClass]="{
+            'is-invalid': (password && password.invalid) && (password.touched || mouseoverLogin)
+          }"/>
+          </div> 
+              <!-- <br> -->
+          <div class="d-flex justify-content-end">
+            <span (mouseenter)="mouseoverLogin=true" (mouseleave)="mouseoverLogin=false">
+              <button type="submit" [disabled]="username.invalid || password.invalid" class="btn btn-primary m-2">Login</button>
+            </span>
+          </div>
+        </form>
+        <br>
+        <div *ngIf="loginInvalid" class="alert alert-danger">Invalid Login Info</div>
+        </div>
+    </div>
+    
+    </div>

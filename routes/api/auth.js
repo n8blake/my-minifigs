@@ -11,7 +11,7 @@ router.post(
       console.log("getting user");
     }
     if (req.session.passport && req.session.passport.user.user_token) {
-      res.status(200).json(req.session.passport.user.user_name);
+      res.status(200).json(req.session.passport.user);
     } else {
       console.log(req.session);
       res.status(401).send();
@@ -21,6 +21,7 @@ router.post(
 
 router.get("/status", function(req, res){
   console.log("get login status route hit")
+  //console.log(req.session.passport)
   if (req.session.passport && req.session.passport.user) {
     res.status(200).json(req.session.passport.user);
   } else {
